@@ -30,7 +30,7 @@ export default function KeyConfigModal() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost">
+        <Button variant="ghost" className="hover:cursor-pointer">
           <Settings className="w-4 h-4" />
         </Button>
       </DialogTrigger>
@@ -56,6 +56,7 @@ export default function KeyConfigModal() {
             </Select>
             <div className="relative w-full">
             <Input
+              id="api-key-input"
               type={showKey ? "text" : "password"}
               placeholder="Paste your API key here"
               value={draftKey}
