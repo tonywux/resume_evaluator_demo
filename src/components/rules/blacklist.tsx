@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Switch } from "@/components/ui/switch"
 
 interface BlacklistConfig {
     companyBlacklistEnabled: boolean
@@ -40,21 +41,23 @@ export default function Blacklist({ isEditing, blacklist, onBlacklistChange }: B
                 <div className="text-md font-bold">Blacklist</div>
             </div>
             <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-1 justify-between items-start">
-                    <div className="flex flex-row gap-2 justify-between items-center">
+                <div className="flex flex-col gap-2 justify-between items-start">
+                    <div className="flex flex-row gap-2 justify-start items-center">
                         {isEditing ? (
-                            <Checkbox 
-                                id="company" 
-                                className="bg-white" 
+                            <Switch 
+                                id="company-switch" 
                                 checked={localBlacklist.companyBlacklistEnabled}
                                 onCheckedChange={(checked) => updateBlacklist({ companyBlacklistEnabled: checked === true })}
                             />
                         ) : (
-                            <div className="w-4 h-4 flex items-center justify-center">
-                                {localBlacklist.companyBlacklistEnabled ? "✓" : "✗"}
-                            </div>
+                            <Switch 
+                                id="company-switch" 
+                                checked={localBlacklist.companyBlacklistEnabled}
+                                disabled
+                            />
                         )}
-                        <Label htmlFor="company" className="text-sm text-slate-600">If candidate has worked in the following company, it will be immediately marked as <span className="font-bold text-red-500">NO MATCH</span></Label>
+                        <Label htmlFor="company" className="text-sm font-normal text-slate-600">If candidate has worked in the following company, it will be immediately marked as NO MATCH.</Label>
+
                     </div>
                     {isEditing ? (
                         <Input 
@@ -67,26 +70,31 @@ export default function Blacklist({ isEditing, blacklist, onBlacklistChange }: B
                             disabled={!localBlacklist.companyBlacklistEnabled}
                         />
                     ) : (
-                        <div className="p-2 border rounded bg-gray-50 text-sm">
-                            {localBlacklist.companyBlacklistEnabled ? (localBlacklist.companyBlacklist || "No company specified") : "Disabled"}
-                        </div>
+                        <Input 
+                            id="blacklist-input-company"
+                            type="text" 
+                            className="bg-white"
+                            value={localBlacklist.companyBlacklist || "No company specified"}
+                            disabled
+                        />
                     )}
                 </div>
                 <div className="flex flex-col gap-1 justify-between items-start">
-                    <div className="flex flex-row gap-2 justify-between items-center">
+                    <div className="flex flex-row gap-2 justify-start items-center">
                         {isEditing ? (
-                            <Checkbox 
-                                id="degree" 
-                                className="bg-white" 
+                            <Switch 
+                                id="degree-switch" 
                                 checked={localBlacklist.degreeBlacklistEnabled}
                                 onCheckedChange={(checked) => updateBlacklist({ degreeBlacklistEnabled: checked === true })}
                             />
                         ) : (
-                            <div className="w-4 h-4 flex items-center justify-center">
-                                {localBlacklist.degreeBlacklistEnabled ? "✓" : "✗"}
-                            </div>
+                            <Switch 
+                                id="degree-switch" 
+                                checked={localBlacklist.degreeBlacklistEnabled}
+                                disabled
+                            />
                         )}
-                        <Label htmlFor="degree" className="text-sm text-slate-600">If candidate's educational degree is in the following list, it will be immediately marked as <span className="font-bold text-red-500">NO MATCH</span></Label>
+                        <Label htmlFor="degree" className="text-sm font-normal text-slate-600">If candidate's educational degree is in the following list, it will be immediately marked as NO MATCH.</Label>
                     </div>
                     {isEditing ? (
                         <Input 
@@ -99,9 +107,13 @@ export default function Blacklist({ isEditing, blacklist, onBlacklistChange }: B
                             disabled={!localBlacklist.degreeBlacklistEnabled}
                         />
                     ) : (
-                        <div className="p-2 border rounded bg-gray-50 text-sm">
-                            {localBlacklist.degreeBlacklistEnabled ? (localBlacklist.degreeBlacklist || "No degree specified") : "Disabled"}
-                        </div>
+                        <Input 
+                            id="blacklist-input-degree"
+                            type="text" 
+                            className="bg-white"
+                            value={localBlacklist.degreeBlacklist || "No degree specified"}
+                            disabled
+                        />
                     )}
                 </div>
             </div>

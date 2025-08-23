@@ -98,7 +98,7 @@ export default function EvaluationRules({ isEditing, rules, onRulesChange }: Eva
                 </div>
             </div>
             
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
                 {localRules.map((rule, index) => (
                     <div key={rule.id} className="flex flex-row gap-2 justify-between items-center">
                         {isEditing ? (
@@ -149,12 +149,20 @@ export default function EvaluationRules({ isEditing, rules, onRulesChange }: Eva
                             </>
                         ) : (
                             <>
-                                <div className="flex-1 p-2 border rounded bg-gray-50 text-sm">
-                                    {rule.description || "No description"}
-                                </div>
-                                <div className="w-36 p-2 border rounded bg-gray-50 text-sm text-center">
-                                    {rule.weight}
-                                </div>
+                                <Input
+                                    id={`evaluation-rule-description-${rule.id}`}
+                                    type="text" 
+                                    value={rule.description || "No description specified"}
+                                    className="bg-white"
+                                    disabled
+                                />
+                                <Input 
+                                    id={`evaluation-rule-weight-${rule.id}`}
+                                    type="number" 
+                                    className="w-36 bg-white"
+                                    value={rule.weight}
+                                    disabled
+                                />
                             </>
                         )}
                     </div>
