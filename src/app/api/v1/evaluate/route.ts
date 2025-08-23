@@ -67,6 +67,7 @@ export interface EvaluateResponse {
       model: string;
       rulesEvaluated: number;
       timestamp: string;
+      executionTimeMs: number;
     };
   };
   error?: string;
@@ -206,7 +207,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<EvaluateR
         provider: body.apiConfig.provider,
         model: config.model,
         rulesEvaluated: ruleResults.length,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        executionTimeMs: endTime - startTime
       }
     };
     

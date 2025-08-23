@@ -36,12 +36,6 @@ export default function EvaluationResult() {
         );
     }
 
-    const getScoreBadgeVariant = (percentage: number) => {
-        if (percentage >= 80) return "default";
-        if (percentage >= 60) return "secondary";
-        return "destructive";
-    };
-
     return (
         <div className="flex flex-col gap-4">
             <div className="flex justify-between items-center">
@@ -59,7 +53,7 @@ export default function EvaluationResult() {
             <div className="bg-white border border-slate-200 p-4 rounded-lg">
                 <div className="flex justify-between items-center mb-3">
                     <h3 className="font-semibold">Overall</h3>
-                    <Badge variant={getScoreBadgeVariant(result.percentage)}>
+                    <Badge variant="secondary">
                         {result.isDisqualified ? '0%' : `${result.percentage}%`}
                     </Badge>
                 </div>
@@ -96,11 +90,11 @@ export default function EvaluationResult() {
                                     {result.breakdown.blacklistResults.map((rule) => (
                                         <div key={rule.rule_id} className="border-l-4 border-red-200 pl-3">
                                             <div className="flex items-center gap-2 mb-1">
-                                                <span className="font-medium text-sm">
+                                                <span className="font-semibold text-sm">
                                                     {rule.dimension_summary}
                                                 </span>
                                             </div>
-                                            <p className="text-xs text-slate-600">{rule.reasoning}</p>
+                                            <p className="text-sm text-slate-600">{rule.reasoning}</p>
                                         </div>
                                     ))}
                                 </div>
@@ -120,9 +114,9 @@ export default function EvaluationResult() {
                             <AccordionContent className="px-4 pb-4">
                                 <div className="space-y-3">
                                     {result.breakdown.ratingResults.map((rule) => (
-                                        <div key={rule.rule_id} className="border-l-4 border-blue-200 pl-3">
+                                        <div key={rule.rule_id} className="border-l-4 border-slate-200 pl-3">
                                             <div className="flex items-center justify-between mb-1">
-                                                <span className="font-medium text-sm">
+                                                <span className="font-semibold text-sm">
                                                     {rule.dimension_summary}
                                                 </span>
                                                 <div className="flex items-center gap-2">
@@ -134,7 +128,7 @@ export default function EvaluationResult() {
                                                     </Badge>
                                                 </div>
                                             </div>
-                                            <p className="text-xs text-slate-600">{rule.reasoning}</p>
+                                            <p className="text-sm text-slate-600">{rule.reasoning}</p>
                                         </div>
                                     ))}
                                 </div>
@@ -147,11 +141,11 @@ export default function EvaluationResult() {
                         <AccordionTrigger className="px-4">
                             <div className="flex items-center gap-2">
                                 <FileSliders className="h-4 w-4 text-slate-600" />
-                                Evaluation Metadata
+                                Metadata
                             </div>
                         </AccordionTrigger>
                         <AccordionContent className="px-4 pb-4">
-                            <div className="grid grid-cols-2 gap-2 text-sm">
+                            <div className="grid grid-cols-2 gap-2 text-xs text-slate-600">
                                 <div>
                                     <span className="font-medium">Provider:</span> {result.metadata.provider}
                                 </div>
@@ -160,6 +154,9 @@ export default function EvaluationResult() {
                                 </div>
                                 <div>
                                     <span className="font-medium">Rules Evaluated:</span> {result.metadata.rulesEvaluated}
+                                </div>
+                                <div>
+                                    <span className="font-medium">Execution Time:</span> {result.metadata.executionTimeMs}ms
                                 </div>
                                 <div>
                                     <span className="font-medium">Timestamp:</span> {new Date(result.metadata.timestamp).toLocaleString()}
