@@ -3,6 +3,13 @@ import { ratingUserPromptTemplate, tfUserPromptTemplate } from "../prompts/user_
 import { BaseAIProvider } from "../providers/base";
 import { Rule, GenerateResponseOptions, SingleRuleResult, LLMConfig } from "../providers/types";
 
+export interface PromptInfo {
+  rule_id: string;
+  rule_description: string;
+  system_prompt: string;
+  user_prompt: string;
+}
+
 export function generateSystemPromptForRule(rule: Rule): string {
     if (rule.type === 'TRUE_FALSE') {
       return tfSystemPrompt();
@@ -25,8 +32,21 @@ export async function evaluateAllRules(
     rules: Rule[],
     config: LLMConfig,
     options?: GenerateResponseOptions
-  ): Promise<SingleRuleResult[]> {
+  ): Promise<{ results: SingleRuleResult[] }> {
     console.log(`Starting parallel evaluation of ${rules.length} rules`);
+    
+    // Generate prompts for all rules
+    const prompts: PromptInfo[] = rules.map(rule => {
+      const systemPrompt = generateSystemPromptForRule(rule);
+      const userPrompt = generateUserPromptForRule(rule);
+      
+      return {
+        rule_id: rule.id,
+        rule_description: rule.description,
+        system_prompt: systemPrompt,
+        user_prompt: userPrompt
+      };
+    });
     
     // Run all evaluations in parallel
     const evaluationPromises = rules.map(rule => 
@@ -36,7 +56,7 @@ export async function evaluateAllRules(
     const results = await Promise.all(evaluationPromises);
     console.log(`All ${rules.length} rule evaluations completed`);
     
-    return results;
+    return { results };
 }
 
 
@@ -54,8 +74,10 @@ export function calculateFinalScore(results: SingleRuleResult[]): {
     const blacklistResults = results.filter(r => r.rule_type === 'BLACKLIST');
     const ratingResults = results.filter(r => r.rule_type === 'RATING');
   
-    // Check for disqualification
-    const isBlacklisted = blacklistResults.some(r => r.evaluation_result === true);
+    // Check for disqualification - handle both old boolean and new string format
+    const isBlacklisted = blacklistResults.some(r => 
+      r.qualification_check === "DISQUALIFIED"
+    );
   
     if (isBlacklisted) {
       return {

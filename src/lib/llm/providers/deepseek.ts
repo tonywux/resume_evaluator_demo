@@ -18,6 +18,7 @@ export class DeepSeekProvider extends BaseAIProvider {
   
     async evaluateSingleRule(
       rule: Rule,
+      config: LLMConfig,
       options: GenerateResponseOptions = {}
     ): Promise<SingleRuleResult> {
       console.log(`Starting single rule evaluation for rule: ${rule.id}`);
@@ -42,15 +43,34 @@ export class DeepSeekProvider extends BaseAIProvider {
           }
         });
   
-        const result = response.choices[0].message.content;
+                const result = response.choices[0].message.content;
         const endTime = Date.now();
         console.log(`Rule ${rule.id} evaluation completed in ${endTime - startTime}ms`);
-  
+
         if (!result) {
-          throw new Error(`No response from OpenAI for rule ${rule.id}`);
+          throw new Error(`No response from DeepSeek for rule ${rule.id}`);
         }
-  
-        return result as unknown as SingleRuleResult;
+
+        // Parse the JSON response and convert to SingleRuleResult format
+        const parsedResult = JSON.parse(result);
+        
+        // Convert to standardized format
+        const singleRuleResult: SingleRuleResult = {
+          rule_id: rule.id,
+          rule_type: rule.type === 'TRUE_FALSE' ? 'BLACKLIST' : 'RATING',
+          dimension_summary: parsedResult.dimensionSummary || parsedResult.ruleExplanation || rule.description,
+          reasoning: parsedResult.reasoning,
+          weight: rule.type === 'RATING' ? (rule as any).weight : undefined
+        };
+
+        // Add type-specific fields
+        if (rule.type === 'TRUE_FALSE') {
+          singleRuleResult.qualification_check = parsedResult.qualification_check;
+        } else {
+          singleRuleResult.evaluation_score = parsedResult.score;
+        }
+
+        return singleRuleResult;
       } catch (error) {
         console.error(`Error evaluating rule ${rule.id}: ${error}`);
         throw error;

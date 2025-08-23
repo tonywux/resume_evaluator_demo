@@ -32,7 +32,7 @@ export interface SingleRuleResult {
     rule_id: string;
     rule_type: 'RATING' | 'BLACKLIST';
     dimension_summary: string;
-    evaluation_result?: boolean; // For BLACKLIST
+    qualification_check?: "DISQUALIFIED" | "PASSED"; // For BLACKLIST
     evaluation_score?: number;   // For RATING (0-5)
     reasoning: string;
     weight?: number;

@@ -59,14 +59,18 @@ export default function Ruleset() {
             
             if (isBrowser()) {
                 saveRuleset(rulesetData)
-                toast.success("Ruleset saved successfully!")
+                toast.success("Success", {
+                    description: "Ruleset has been saved to local storage.",
+                })
             }
             
             setIsEditing(false)
             setOriginalData(null)
         } catch (error) {
             console.error("Failed to save ruleset:", error)
-            toast.error("Failed to save ruleset. Please try again.")
+            toast.error("Failed", {
+                description: "Failed to save ruleset. Please try again."
+            })
         }
     }
 

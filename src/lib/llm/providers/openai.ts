@@ -19,6 +19,7 @@ export class OpenAIProvider extends BaseAIProvider {
   
     async evaluateSingleRule(
       rule: Rule,
+      config: LLMConfig,
       options: GenerateResponseOptions = {}
     ): Promise<SingleRuleResult> {
       console.log(`Starting single rule evaluation for rule: ${rule.id}`);
