@@ -6,11 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-
-interface ApiConfig {
-  provider: string;
-  key: string;
-}
+import { saveConfig, loadConfig, clearConfig, isBrowser, ApiConfig } from "@/lib/functions/storage";
+import { toast } from "sonner";
 
 export default function KeyConfigModal() {
   const [storedConfig, setStoredConfig] = useState<ApiConfig>({ provider: "", key: "" });
@@ -18,6 +15,16 @@ export default function KeyConfigModal() {
   const [draftKey, setDraftKey] = useState("");
   const [showKey, setShowKey] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+
+  // Load config from localStorage on component mount
+  useEffect(() => {
+    if (isBrowser()) {
+      const savedConfig = loadConfig();
+      if (savedConfig) {
+        setStoredConfig(savedConfig);
+      }
+    }
+  }, []);
 
   // When opening, load the draft from the stored values
   useEffect(() => {
@@ -87,10 +94,22 @@ export default function KeyConfigModal() {
                 <Button 
                 variant="ghost" 
                 onClick={() => {
-                    setDraftProvider("");
-                    setDraftKey("");
-                    setStoredConfig({ provider: "", key: "" });
-                    setIsOpen(false);
+                    try {
+                      toast.success('Config cleared', {
+                        description: 'Your configuration has been cleared',
+                      });
+                      clearConfig();
+                      setDraftProvider("");
+                      setDraftKey("");
+                      setStoredConfig({ provider: "", key: "" });
+                      setIsOpen(false);
+                      console.log('Config cleared');
+                    } catch (error) {
+                      toast.error('Failed to clear config', {
+                        description: 'Please try again',
+                      });
+                      console.error('Failed to clear config:', error);
+                    }
                 }}>
                     Reset
                 </Button>
@@ -100,8 +119,21 @@ export default function KeyConfigModal() {
             <Button
                 disabled={!draftProvider || !draftKey}
                 onClick={() => {
-                setStoredConfig({ provider: draftProvider, key: draftKey });
-                setIsOpen(false);
+                const newConfig = { provider: draftProvider, key: draftKey };
+                try {
+                  toast.success('Config saved', {
+                    description: 'Your configuration has been saved',
+                  });
+                  saveConfig(newConfig);
+                  setStoredConfig(newConfig);
+                  setIsOpen(false);
+                  console.log('Config saved');
+                } catch (error) {
+                  toast.error('Failed to save config', {
+                    description: 'Please try again',
+                  });
+                  console.error('Failed to save config:', error);
+                }
                 }}
             >
                 Save

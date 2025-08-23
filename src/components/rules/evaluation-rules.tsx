@@ -12,19 +12,28 @@ interface Rule {
     weight: number
 }
 
-export default function EvaluationRules() {
-    const [rules, setRules] = useState<Rule[]>([
-        { id: "1", description: "", weight: 1.0 }
-    ])
+interface EvaluationRulesProps {
+    isEditing: boolean
+    rules: Rule[]
+    onRulesChange?: (rules: Rule[]) => void
+}
+
+export default function EvaluationRules({ isEditing, rules, onRulesChange }: EvaluationRulesProps) {
+    const [localRules, setLocalRules] = useState<Rule[]>(rules)
     const [weightError, setWeightError] = useState<string>("")
+
+    // Sync with external rules when they change
+    useEffect(() => {
+        setLocalRules(rules)
+    }, [rules])
 
     // Calculate total weight and validate
     useEffect(() => {
-        const totalWeight = rules.reduce((sum, rule) => sum + rule.weight, 0)
+        const totalWeight = localRules.reduce((sum, rule) => sum + rule.weight, 0)
         const roundedTotal = Math.round(totalWeight * 10) / 10 // Round to 1 decimal place
         
         // Check for invalid individual weights
-        const invalidWeights = rules.filter(rule => rule.weight < 0.1 || rule.weight > 1.0)
+        const invalidWeights = localRules.filter(rule => rule.weight < 0.1 || rule.weight > 1.0)
         
         if (invalidWeights.length > 0) {
             setWeightError("Each weight must be between 0.1 and 1.0")
@@ -33,7 +42,7 @@ export default function EvaluationRules() {
         } else {
             setWeightError("")
         }
-    }, [rules])
+    }, [localRules])
 
     const addRule = () => {
         const newRule: Rule = {
@@ -41,26 +50,42 @@ export default function EvaluationRules() {
             description: "",
             weight: 0.1
         }
-        setRules([...rules, newRule])
+        const newRules = [...localRules, newRule]
+        setLocalRules(newRules)
+        if (isEditing && onRulesChange) {
+            onRulesChange(newRules)
+        }
     }
 
     const removeRule = (id: string) => {
-        if (rules.length > 1) {
-            setRules(rules.filter(rule => rule.id !== id))
+        if (localRules.length > 1) {
+            const newRules = localRules.filter(rule => rule.id !== id)
+            setLocalRules(newRules)
+            if (isEditing && onRulesChange) {
+                onRulesChange(newRules)
+            }
         }
     }
 
     const updateRuleDescription = (id: string, description: string) => {
-        setRules(rules.map(rule => 
+        const newRules = localRules.map(rule => 
             rule.id === id ? { ...rule, description } : rule
-        ))
+        )
+        setLocalRules(newRules)
+        if (isEditing && onRulesChange) {
+            onRulesChange(newRules)
+        }
     }
 
     const updateRuleWeight = (id: string, weight: number) => {
         // Allow any input during typing, validation happens in useEffect
-        setRules(rules.map(rule => 
+        const newRules = localRules.map(rule => 
             rule.id === id ? { ...rule, weight } : rule
-        ))
+        )
+        setLocalRules(newRules)
+        if (isEditing && onRulesChange) {
+            onRulesChange(newRules)
+        }
     }
 
     return (
@@ -74,51 +99,64 @@ export default function EvaluationRules() {
             </div>
             
             <div className="flex flex-col gap-4">
-                {rules.map((rule, index) => (
+                {localRules.map((rule, index) => (
                     <div key={rule.id} className="flex flex-row gap-2 justify-between items-center">
-                        <Input 
-                            id={`evaluation-rule-description-${rule.id}`}
-                            type="text" 
-                            placeholder="Enter rules description here"
-                            value={rule.description}
-                            onChange={(e) => updateRuleDescription(rule.id, e.target.value)}
-                            className="bg-white"
-                        />
-                        <Input 
-                            id={`evaluation-rule-weight-${rule.id}`}
-                            type="number" 
-                            placeholder="Weight" 
-                            className="w-36 bg-white"
-                            value={rule.weight}
-                            min="0.1"
-                            max="1.0"
-                            step="0.1"
-                            onChange={(e) => {
-                                const value = e.target.value
-                                // Allow empty string or valid numbers (including partial input like "0.")
-                                if (value === "" || !isNaN(parseFloat(value))) {
-                                    updateRuleWeight(rule.id, value === "" ? 0 : parseFloat(value))
-                                }
-                            }}
-                        />
-                        {index === 0 && (
-                            <Button variant="ghost" onClick={addRule}>
-                                <PlusIcon className="w-4 h-4" />
-                            </Button>
+                        {isEditing ? (
+                            <>
+                                <Input 
+                                    id={`evaluation-rule-description-${rule.id}`}
+                                    type="text" 
+                                    placeholder="Enter rules description here"
+                                    value={rule.description}
+                                    onChange={(e) => updateRuleDescription(rule.id, e.target.value)}
+                                    className="bg-white"
+                                />
+                                <Input 
+                                    id={`evaluation-rule-weight-${rule.id}`}
+                                    type="number" 
+                                    placeholder="Weight" 
+                                    className="w-36 bg-white"
+                                    value={rule.weight}
+                                    min="0.1"
+                                    max="1.0"
+                                    step="0.1"
+                                    onChange={(e) => {
+                                        const value = e.target.value
+                                        // Allow empty string or valid numbers (including partial input like "0.")
+                                        if (value === "" || !isNaN(parseFloat(value))) {
+                                            updateRuleWeight(rule.id, value === "" ? 0 : parseFloat(value))
+                                        }
+                                    }}
+                                />
+                                {index === 0 && (
+                                    <Button variant="ghost" onClick={addRule}>
+                                        <PlusIcon className="w-4 h-4" />
+                                    </Button>
+                                )}
+                                {index > 0 && (
+                                    <Button variant="ghost" onClick={addRule}>
+                                        <PlusIcon className="w-4 h-4" />
+                                    </Button>
+                                )}
+                                <Button 
+                                    variant="ghost" 
+                                    onClick={() => removeRule(rule.id)}
+                                    disabled={localRules.length === 1}
+                                    className={localRules.length === 1 ? "opacity-50 cursor-not-allowed" : ""}
+                                >
+                                    <TrashIcon className="w-4 h-4" />
+                                </Button>
+                            </>
+                        ) : (
+                            <>
+                                <div className="flex-1 p-2 border rounded bg-gray-50 text-sm">
+                                    {rule.description || "No description"}
+                                </div>
+                                <div className="w-36 p-2 border rounded bg-gray-50 text-sm text-center">
+                                    {rule.weight}
+                                </div>
+                            </>
                         )}
-                        {index > 0 && (
-                            <Button variant="ghost" onClick={addRule}>
-                                <PlusIcon className="w-4 h-4" />
-                            </Button>
-                        )}
-                        <Button 
-                            variant="ghost" 
-                            onClick={() => removeRule(rule.id)}
-                            disabled={rules.length === 1}
-                            className={rules.length === 1 ? "opacity-50 cursor-not-allowed" : ""}
-                        >
-                            <TrashIcon className="w-4 h-4" />
-                        </Button>
                     </div>
                 ))}
                 
