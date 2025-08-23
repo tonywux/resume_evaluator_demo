@@ -1,4 +1,7 @@
 import { LLMConfig, Rule, GenerateResponseOptions, SingleRuleResult } from "./types"
+import { OpenAIProvider } from "./openai";
+import { QwenProvider } from "./qwen";
+import { DeepSeekProvider } from "./deepseek";
 
 // Abstract base class for AI providers
 export abstract class BaseAIProvider {
@@ -13,14 +16,10 @@ export abstract class BaseAIProvider {
 export function getProvider(providerName: string, config: LLMConfig): BaseAIProvider {
     switch (providerName.toLowerCase()) {
       case 'openai':
-        // Dynamic import to avoid circular dependency
-        const { OpenAIProvider } = require("./openai");
         return new OpenAIProvider(config);
       case 'deepseek':
-        const { DeepSeekProvider } = require("./deepseek");
         return new DeepSeekProvider(config);
       case 'qwen':
-        const { QwenProvider } = require("./qwen");
         return new QwenProvider(config);
       default:
         throw new Error(`Unknown provider: ${providerName}`);

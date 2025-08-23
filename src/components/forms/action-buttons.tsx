@@ -5,7 +5,7 @@ import { useInputs } from "@/lib/hooks/useInputs"
 import { useEvaluation } from "@/lib/hooks/useEvaluation"
 import { AlertCircle, Play, Loader2 } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { loadConfig, hasConfig, hasRuleset } from "@/lib/functions/storage"
+import { hasConfig, hasRuleset } from "@/lib/functions/storage"
 import { useEffect, useState } from "react"
 
 export default function ActionButtons() {

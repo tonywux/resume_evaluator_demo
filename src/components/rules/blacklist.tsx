@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Switch } from "@/components/ui/switch"
 
 interface BlacklistConfig {
@@ -94,7 +93,7 @@ export default function Blacklist({ isEditing, blacklist, onBlacklistChange }: B
                                 disabled
                             />
                         )}
-                        <Label htmlFor="degree" className="text-sm font-normal text-slate-600">If candidate's educational degree is in the following list, it will be immediately marked as NO MATCH.</Label>
+                        <Label htmlFor="degree" className="text-sm font-normal text-slate-600">If candidate&apos;s educational degree is in the following list, it will be immediately marked as NO MATCH.</Label>
                     </div>
                     {isEditing ? (
                         <Input 

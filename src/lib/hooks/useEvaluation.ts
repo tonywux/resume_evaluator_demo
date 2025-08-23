@@ -85,12 +85,13 @@ export function EvaluationProvider({ children }: { children: ReactNode }): React
         return newState;
       });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Evaluation error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
       setState(prev => ({
         ...prev,
         isLoading: false,
-        error: error.message || 'An unexpected error occurred',
+        error: errorMessage,
       }));
     }
   }, []);

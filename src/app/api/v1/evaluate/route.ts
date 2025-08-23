@@ -217,7 +217,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<EvaluateR
       data: result
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Evaluation API error:', error);
     
     // Clean up global context on error
@@ -228,7 +228,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<EvaluateR
     // Handle unexpected errors
     return NextResponse.json({
       success: false,
-      error: `Evaluation failed: ${error.message || error}`,
+      error: `Evaluation failed: ${error instanceof Error ? error.message : String(error)}`,
       code: 'EVALUATION_FAILED'
     }, { status: 500 });
   }

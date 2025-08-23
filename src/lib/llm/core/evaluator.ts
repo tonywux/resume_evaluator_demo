@@ -35,19 +35,6 @@ export async function evaluateAllRules(
   ): Promise<{ results: SingleRuleResult[] }> {
     console.log(`Starting parallel evaluation of ${rules.length} rules`);
     
-    // Generate prompts for all rules
-    const prompts: PromptInfo[] = rules.map(rule => {
-      const systemPrompt = generateSystemPromptForRule(rule);
-      const userPrompt = generateUserPromptForRule(rule);
-      
-      return {
-        rule_id: rule.id,
-        rule_description: rule.description,
-        system_prompt: systemPrompt,
-        user_prompt: userPrompt
-      };
-    });
-    
     // Run all evaluations in parallel
     const evaluationPromises = rules.map(rule => 
       provider.evaluateSingleRule(rule, config, options)

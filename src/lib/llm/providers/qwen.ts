@@ -1,5 +1,5 @@
 import { BaseAIProvider } from "./base";
-import { LLMConfig, Rule, GenerateResponseOptions, SingleRuleResult } from "./types";
+import { LLMConfig, Rule, GenerateResponseOptions, SingleRuleResult, EvaluationRule } from "./types";
 import { generateSystemPromptForRule } from "../core/evaluator";
 import { qwenTfUserPromptTemplate, qwenRatingUserPromptTemplate } from "../prompts/user_prompt_tempate";
 import { OpenAI } from "openai";
@@ -60,7 +60,7 @@ export class QwenProvider extends BaseAIProvider {
           rule_type: rule.type === 'TRUE_FALSE' ? 'BLACKLIST' : 'RATING',
           dimension_summary: parsedResult.dimensionSummary || parsedResult.ruleExplanation || rule.description,
           reasoning: parsedResult.reasoning,
-          weight: rule.type === 'RATING' ? (rule as any).weight : undefined
+          weight: rule.type === 'RATING' ? (rule as EvaluationRule).weight : undefined
         };
 
         // Add type-specific fields
