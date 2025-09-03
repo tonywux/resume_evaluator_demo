@@ -96,7 +96,7 @@ export default function Ruleset() {
     return (
         <div className="flex flex-col gap-6 p-6 rounded-lg bg-slate-50">
             <div className="flex justify-between items-center">
-                <h2 className="text-xl font-bold">Rules</h2>
+                <h2 className="text-xl font-bold">Rules [Approach A]</h2>
                 {!isEditing ? (
                     <Button onClick={handleEdit} variant="outline" size="sm">
                         <EditIcon className="w-4 h-4 mr-2" />

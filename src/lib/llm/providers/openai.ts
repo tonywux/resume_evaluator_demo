@@ -59,4 +59,37 @@ export class OpenAIProvider extends BaseAIProvider {
         throw error;
       }
     }
+
+    async generateResponse(
+      prompts: { systemPrompt: string; userPrompt: string },
+      config: LLMConfig,
+      options: GenerateResponseOptions = {}
+    ): Promise<string> {
+      console.log('Starting OpenAI text generation for Approach B');
+      
+      try {
+        const model = options.model || config.model || 'gpt-4o-mini';
+        const temperature = options.temperature || config.temperature || 0.3;
+
+        const response = await this.openai.chat.completions.create({
+          model,
+          temperature,
+          messages: [
+            { role: 'system', content: prompts.systemPrompt },
+            { role: 'user', content: prompts.userPrompt }
+          ]
+        });
+
+        const content = response.choices[0]?.message?.content;
+        if (!content) {
+          throw new Error('No response content from OpenAI');
+        }
+
+        console.log('OpenAI text generation completed successfully');
+        return content;
+      } catch (error) {
+        console.error('Error in OpenAI text generation:', error);
+        throw error;
+      }
+    }
   }

@@ -25,8 +25,14 @@ export interface RulesetData {
   blacklist: BlacklistConfig;
 }
 
+export interface Ruleset2Data {
+  systemPrompt: string;
+  userPrompt: string;
+}
+
 const CONFIG_STORAGE_KEY = 'llm_config';
 const RULESET_STORAGE_KEY = 'evaluation_ruleset';
+const RULESET2_STORAGE_KEY = 'evaluation_ruleset_2';
 
 /**
  * Save user configuration to localStorage
@@ -154,6 +160,71 @@ export function hasRuleset(): boolean {
     return localStorage.getItem(RULESET_STORAGE_KEY) !== null;
   } catch (error) {
     console.error('Failed to check ruleset existence:', error);
+    return false;
+  }
+}
+
+/**
+ * Save ruleset2 data to localStorage
+ */
+export function saveRuleset2(ruleset2: Ruleset2Data): void {
+  try {
+    const ruleset2String = JSON.stringify(ruleset2);
+    localStorage.setItem(RULESET2_STORAGE_KEY, ruleset2String);
+  } catch (error) {
+    console.error('Failed to save ruleset2 to localStorage:', error);
+    throw new Error('Failed to save ruleset2');
+  }
+}
+
+/**
+ * Load ruleset2 data from localStorage
+ */
+export function loadRuleset2(): Ruleset2Data | null {
+  try {
+    const ruleset2String = localStorage.getItem(RULESET2_STORAGE_KEY);
+    if (!ruleset2String) {
+      return null;
+    }
+    
+    const ruleset2 = JSON.parse(ruleset2String) as Ruleset2Data;
+    
+    // Validate the loaded ruleset2 structure
+    if (typeof ruleset2.systemPrompt !== 'string' || typeof ruleset2.userPrompt !== 'string') {
+      console.warn('Invalid ruleset2 structure in localStorage, clearing...');
+      clearRuleset2();
+      return null;
+    }
+    
+    return ruleset2;
+  } catch (error) {
+    console.error('Failed to load ruleset2 from localStorage:', error);
+    // Clear corrupted data
+    clearRuleset2();
+    return null;
+  }
+}
+
+/**
+ * Clear ruleset2 data from localStorage
+ */
+export function clearRuleset2(): void {
+  try {
+    localStorage.removeItem(RULESET2_STORAGE_KEY);
+  } catch (error) {
+    console.error('Failed to clear ruleset2 from localStorage:', error);
+    throw new Error('Failed to clear ruleset2');
+  }
+}
+
+/**
+ * Check if ruleset2 exists in localStorage
+ */
+export function hasRuleset2(): boolean {
+  try {
+    return localStorage.getItem(RULESET2_STORAGE_KEY) !== null;
+  } catch (error) {
+    console.error('Failed to check ruleset2 existence:', error);
     return false;
   }
 }

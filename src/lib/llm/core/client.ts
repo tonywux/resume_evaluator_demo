@@ -1,5 +1,6 @@
 import { loadConfig, loadRuleset, isBrowser, ApiConfig, RulesetData } from "../../functions/storage";
-import { getProvider, BaseAIProvider } from "../providers/base";
+import { BaseAIProvider } from "../providers/base";
+import { getProvider } from "../providers/factory";
 import { evaluateAllRules, calculateFinalScore } from "./evaluator";
 import { Rule, LLMConfig, GenerateResponseOptions, SingleRuleResult, BlacklistRule, EvaluationRule } from "../providers/types";
 

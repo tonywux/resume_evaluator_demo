@@ -23,7 +23,7 @@ export const ratingUserPromptTemplate = (rule: EvaluationRule) => {
     const context = globalThis.evaluationContext;
     return `  
 RULE TO EVALUATE: ${rule.description}
-RULE TYPE: Rating (0-5 scale)
+RULE TYPE: Rating (0-10 scale)
 
 JOB DESCRIPTION:
 ###
@@ -62,7 +62,7 @@ export const qwenRatingUserPromptTemplate = (rule: EvaluationRule) => {
     const context = globalThis.evaluationContext;
     return `
 RULE TO EVALUATE: ${rule.description}
-RULE TYPE: Rating (0-5 scale)
+RULE TYPE: Rating (0-10 scale)
 
 JOB DESCRIPTION:
 ###

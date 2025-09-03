@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getProvider } from '@/lib/llm/providers/base';
+import { getProvider } from '@/lib/llm/providers/factory';
 import { evaluateAllRules, calculateFinalScore } from '@/lib/llm/core/evaluator';
 import { Rule, LLMConfig, BlacklistRule, EvaluationRule } from '@/lib/llm/providers/types';
 

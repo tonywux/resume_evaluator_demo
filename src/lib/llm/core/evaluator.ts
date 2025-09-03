@@ -88,12 +88,12 @@ export function calculateFinalScore(results: SingleRuleResult[]): {
     });
   
     const finalScore = totalWeight > 0 ? weightedScore / totalWeight : 0;
-    const percentage = (finalScore / 5) * 100;
+    const percentage = (finalScore / 10) * 100;
   
     return {
       finalScore: Math.round(finalScore * 100) / 100, // Round to 2 decimal places
       isDisqualified: false,
-      maxPossibleScore: 5,
+      maxPossibleScore: 10,
       percentage: Math.round(percentage * 100) / 100,
       breakdown: { ratingResults }
     };

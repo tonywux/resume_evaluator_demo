@@ -93,7 +93,7 @@ export default function EvaluationRules({ isEditing, rules, onRulesChange }: Eva
                 <div className="text-md font-bold">Evaluation Rules</div>
                 <div className="text-sm text-slate-600">
                     Please set up the rules for the evaluation process. 
-                    Each rule will be scored on a scale from 0 to 5. You can also assign a weight (0.1 – 1.0) to indicate the importance of each rule in the overall evaluation.
+                    Each rule will be scored on a scale from 0 to 10. You can also assign a weight (0.1 – 1.0) to indicate the importance of each rule in the overall evaluation.
                 </div>
             </div>
             

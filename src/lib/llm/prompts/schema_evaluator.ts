@@ -19,7 +19,7 @@ export function getSchemaForRule(rule: Rule) {
         rule_id: z.string().describe("The ID of the rule being evaluated"),
         rule_type: z.literal("RATING").describe("The type of rule"),
         dimension_summary: z.string().describe("One or two words to describe the rating rule"),
-        evaluation_score: z.number().min(0).max(5).describe("Score from 0-5 for this evaluation criterion"),
+        evaluation_score: z.number().min(0).max(10).describe("Score from 0-10 for this evaluation criterion"),
         reasoning: z.string().describe("One or two sentences to explain the score"),
         weight: z.number().describe("Weight of this rule in overall evaluation"),
         });

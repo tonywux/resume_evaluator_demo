@@ -37,3 +37,24 @@ export interface SingleRuleResult {
     reasoning: string;
     weight?: number;
 }
+
+// Approach B evaluation request types
+export interface EvaluationRequestB {
+    resume: string;
+    jobDescription: string;
+    systemPrompt: string;
+    userPrompt: string;
+}
+
+// Individual reason/aspect for Approach B
+export interface EvaluationAspect {
+    item: string;          // evaluation aspect name
+    score: number;         // aspect score (0-10 or similar scale)
+    reason: string;        // analysis reason for this aspect
+}
+
+// Approach B evaluation result
+export interface EvaluationResultB {
+    totalScore: number;           // overall total score
+    reasons: EvaluationAspect[];  // array of individual aspects
+}

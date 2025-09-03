@@ -76,4 +76,37 @@ export class QwenProvider extends BaseAIProvider {
         throw error;
       }
     }
+
+    async generateResponse(
+      prompts: { systemPrompt: string; userPrompt: string },
+      config: LLMConfig,
+      options: GenerateResponseOptions = {}
+    ): Promise<string> {
+      console.log('Starting Qwen text generation for Approach B');
+      
+      try {
+        const model = options.model || config.model || 'qwen-max-latest';
+        const temperature = options.temperature || config.temperature || 0.3;
+
+        const response = await this.openai.chat.completions.create({
+          model,
+          temperature,
+          messages: [
+            { role: 'system', content: prompts.systemPrompt },
+            { role: 'user', content: prompts.userPrompt }
+          ]
+        });
+
+        const content = response.choices[0]?.message?.content;
+        if (!content) {
+          throw new Error('No response content from Qwen');
+        }
+
+        console.log('Qwen text generation completed successfully');
+        return content;
+      } catch (error) {
+        console.error('Error in Qwen text generation:', error);
+        throw error;
+      }
+    }
   }

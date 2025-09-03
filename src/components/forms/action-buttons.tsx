@@ -3,17 +3,20 @@
 import { Button } from "@/components/ui/button"
 import { useInputs } from "@/lib/hooks/useInputs"
 import { useEvaluation } from "@/lib/hooks/useEvaluation"
-import { AlertCircle, Play, Loader2 } from "lucide-react"
+import { useEvaluationB } from "@/lib/hooks/useEvaluationB"
+import { AlertCircle, Play, Loader2, Settings, Zap } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { hasConfig, hasRuleset } from "@/lib/functions/storage"
+import { hasConfig, hasRuleset, hasRuleset2 } from "@/lib/functions/storage"
 import { useEffect, useState } from "react"
 
 export default function ActionButtons() {
     const { resume, jobDescription } = useInputs();
     const { isLoading, startEvaluation, error, clearError } = useEvaluation();
+    const { isLoading: isLoadingB, startEvaluationB, error: errorB, clearError: clearErrorB } = useEvaluationB();
     const [configStatus, setConfigStatus] = useState({
         hasApiConfig: false,
         hasRules: false,
+        hasRulesB: false,
         isChecking: true
     });
 
@@ -23,6 +26,7 @@ export default function ActionButtons() {
             setConfigStatus({
                 hasApiConfig: hasConfig(),
                 hasRules: hasRuleset(),
+                hasRulesB: hasRuleset2(),
                 isChecking: false
             });
         };
@@ -74,16 +78,102 @@ export default function ActionButtons() {
         }
     };
 
+    const handleStartB = async () => {
+        clearErrorB();
+        
+        // Validate inputs
+        if (!resume.trim()) {
+            alert('Please enter resume content');
+            return;
+        }
+        
+        if (!jobDescription.trim()) {
+            alert('Please enter job description');
+            return;
+        }
+
+        // Check configuration
+        if (!configStatus.hasApiConfig) {
+            alert('Please configure your API key and provider in the header settings');
+            return;
+        }
+
+        if (!configStatus.hasRulesB) {
+            alert('Please configure Approach B prompts before starting');
+            return;
+        }
+
+        try {
+            await startEvaluationB(resume, jobDescription);
+        } catch (error) {
+            console.error('Start Approach B evaluation error:', error);
+        }
+    };
+
+    const handleStartBoth = async () => {
+        clearError();
+        clearErrorB();
+        
+        // Validate inputs
+        if (!resume.trim()) {
+            alert('Please enter resume content');
+            return;
+        }
+        
+        if (!jobDescription.trim()) {
+            alert('Please enter job description');
+            return;
+        }
+
+        // Check configuration
+        if (!configStatus.hasApiConfig) {
+            alert('Please configure your API key and provider in the header settings');
+            return;
+        }
+
+        if (!configStatus.hasRules) {
+            alert('Please configure Approach A evaluation rules before starting');
+            return;
+        }
+
+        if (!configStatus.hasRulesB) {
+            alert('Please configure Approach B prompts before starting');
+            return;
+        }
+
+        try {
+            // Run both evaluations in parallel
+            await Promise.all([
+                startEvaluation(resume, jobDescription),
+                startEvaluationB(resume, jobDescription)
+            ]);
+        } catch (error) {
+            console.error('Start both evaluations error:', error);
+        }
+    };
+
     const canStart = resume.trim() && 
                    jobDescription.trim() && 
                    configStatus.hasApiConfig && 
                    configStatus.hasRules && 
-                   !isLoading;
+                   !isLoading && !isLoadingB;
+
+    const canStartB = resume.trim() && 
+                    jobDescription.trim() && 
+                    configStatus.hasApiConfig && 
+                    configStatus.hasRulesB && 
+                    !isLoading && !isLoadingB;
+
+    const canStartBoth = resume.trim() && 
+                       jobDescription.trim() && 
+                       configStatus.hasApiConfig && 
+                       configStatus.hasRules && 
+                       configStatus.hasRulesB && 
+                       !isLoading && !isLoadingB;
 
     const getStatusMessage = () => {
         if (configStatus.isChecking) return 'Checking configuration...';
         if (!configStatus.hasApiConfig) return 'API configuration missing';
-        if (!configStatus.hasRules) return 'Evaluation rules missing';
         if (!resume.trim() || !jobDescription.trim()) return 'Please fill in all fields';
         return 'Ready to evaluate';
     };
@@ -94,7 +184,7 @@ export default function ActionButtons() {
                 <Alert variant="destructive">
                     <AlertCircle className="h-4 w-4" />
                     <AlertDescription>
-                        {error}
+                        Approach A Error: {error}
                         <Button 
                             variant="ghost" 
                             size="sm" 
@@ -106,26 +196,87 @@ export default function ActionButtons() {
                     </AlertDescription>
                 </Alert>
             )}
+
+            {errorB && (
+                <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                        Approach B Error: {errorB}
+                        <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={clearErrorB}
+                            className="ml-2 h-auto p-1 text-xs"
+                        >
+                            Dismiss
+                        </Button>
+                    </AlertDescription>
+                </Alert>
+            )}
             
-            <div className="flex flex-row justify-between items-center">
-                <div className="text-sm text-muted-foreground">
+            <div className="flex justify-between items-center gap-3">
+                <div className="text-sm text-muted-foreground text-center">
                     {getStatusMessage()}
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 justify-center flex-wrap">
                     <Button 
                         onClick={handleStart}
                         disabled={!canStart || isLoading}
-                        className="min-w-[100px]"
+                        className="min-w-[110px] flex-1 max-w-[140px]"
+                        variant="outline"
                     >
                         {isLoading ? (
                             <>
-                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                Evaluating...
+                                <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                                Running A...
                             </>
                         ) : (
                             <>
-                                <Play className="h-4 w-4 mr-2" />
-                                Start
+                                <Play className="h-4 w-4 mr-1" />
+                                Approach A
+                            </>
+                        )}
+                    </Button>
+                    
+                    <Button 
+                        onClick={handleStartB}
+                        disabled={!canStartB || isLoadingB}
+                        className="min-w-[110px] flex-1 max-w-[140px]"
+                        variant="outline"
+                    >
+                        {isLoadingB ? (
+                            <>
+                                <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                                Running B...
+                            </>
+                        ) : (
+                            <>
+                                <Play className="h-4 w-4 mr-1" />
+                                Approach B
+                            </>
+                        )}
+                    </Button>
+
+                    <Button 
+                        onClick={handleStartBoth}
+                        disabled={!canStartBoth || isLoading || isLoadingB}
+                        className="min-w-[110px] flex-1 max-w-[140px]"
+                        variant="outline"
+                    >
+                        {(isLoading && isLoadingB) ? (
+                            <>
+                                <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                                Running All...
+                            </>
+                        ) : (isLoading || isLoadingB) ? (
+                            <>
+                                <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                                Please wait...
+                            </>
+                        ) : (
+                            <>
+                                <Zap className="h-4 w-4 mr-1" />
+                                Both
                             </>
                         )}
                     </Button>
