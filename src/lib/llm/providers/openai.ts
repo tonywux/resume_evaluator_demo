@@ -68,7 +68,7 @@ export class OpenAIProvider extends BaseAIProvider {
       console.log('Starting OpenAI text generation for Approach B');
       
       try {
-        const model = options.model || config.model || 'gpt-4o-mini';
+        const model = options.model || config.model || 'gpt-5-mini';
         const temperature = options.temperature || config.temperature || 0.3;
 
         const response = await this.openai.chat.completions.create({
